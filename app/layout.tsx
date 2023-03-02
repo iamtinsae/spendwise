@@ -3,6 +3,7 @@ import styles from './page.module.css';
 import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
 import clsx from '@/lib/clsx';
+import { ClientProvider } from '@/client/trpc-client';
 
 export const metadata = {
   title: 'Spend Wise',
@@ -19,15 +20,19 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={spaceGrotesk.className}>
-        <main className={clsx(styles.main, spaceGrotesk.className)}>
-          <Link href="/">
-            <h1 className={clsx('text-4xl', styles.underlined)}>Spend Wise</h1>
-          </Link>
-          {children}
-        </main>
-      </body>
-    </html>
+    <ClientProvider>
+      <html lang="en">
+        <body className={spaceGrotesk.className}>
+          <main className={clsx(styles.main, spaceGrotesk.className)}>
+            <Link href="/">
+              <h1 className={clsx('text-4xl', styles.underlined)}>
+                Spend Wise
+              </h1>
+            </Link>
+            {children}
+          </main>
+        </body>
+      </html>
+    </ClientProvider>
   );
 }
