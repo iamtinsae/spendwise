@@ -26,3 +26,25 @@
   background-repeat: round;
   background-position: 0em;
 }
+
+.loader {
+  position: relative;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 5em;
+}
+
+.loader:before {
+  content: attr(data-text);
+  position: absolute;
+  overflow: hidden;
+  max-width: 7em;
+  white-space: nowrap;
+  color: #fff;
+  animation: loading 8s linear;
+}
+
+@keyframes loading {
+  0% {
+    max-width: 0;
+  }
+}
