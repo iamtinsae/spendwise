@@ -39,15 +39,16 @@ model Session {
 }
 
 model User {
-    id            String          @id @default(cuid())
-    name          String?
-    email         String?         @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    transactions  Transaction[]
-    MonthlyBudget MonthlyBudget[]
+    id             String          @id @default(cuid())
+    name           String?
+    email          String?         @unique
+    emailVerified  DateTime?
+    image          String?
+    accounts       Account[]
+    sessions       Session[]
+    transactions   Transaction[]
+    monthlyBudgets MonthlyBudget[]
+    categories     Category[]
 }
 
 model VerificationToken {
@@ -77,6 +78,7 @@ model Category {
     createdAt    DateTime      @default(now())
     updatedAt    DateTime      @updatedAt
     transactions Transaction[]
+    User         User          @relation(fields: [userId], references: [id])
     userId       String
 }
 
