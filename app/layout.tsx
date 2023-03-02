@@ -4,10 +4,10 @@ import Link from 'next/link';
 import { Space_Grotesk } from 'next/font/google';
 import clsx from '@/lib/clsx';
 import { ClientProvider } from '@/client/trpc-client';
-import { getSession, SessionProvider, useSession } from 'next-auth/react';
 import SignIn from '@/components/sign-in';
-import { getServerSession, Session } from 'next-auth';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/server/auth';
+import Header from '@/components/header';
 
 export const metadata = {
   title: 'Spend Wise',
@@ -35,7 +35,14 @@ export default async function RootLayout({
                 Spend Wise
               </h1>
             </Link>
-            {session?.user ? children : <SignIn />}
+            {session?.user ? (
+              <>
+                <Header />
+                <div className="mt-4">{children}</div>
+              </>
+            ) : (
+              <SignIn />
+            )}
           </main>
         </body>
       </html>
