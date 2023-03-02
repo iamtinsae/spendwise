@@ -29,8 +29,8 @@
 
 .loader {
   position: relative;
-  color: rgba(255, 255, 255, 0.3);
-  font-size: 5em;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 4em;
 }
 
 .loader:before {
@@ -39,7 +39,7 @@
   overflow: hidden;
   max-width: 7em;
   white-space: nowrap;
-  color: #fff;
+  color: #7fffd4;
   animation: loading 8s linear;
 }
 
