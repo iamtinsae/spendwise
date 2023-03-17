@@ -2,7 +2,23 @@
 
 import { api } from '@/lib/api';
 import clsx from '@/lib/clsx';
-import { useRef, useState } from 'react';
+import { useRef, useState, Fragment } from 'react';
+import { Listbox, Transition } from '@headlessui/react';
+import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/24/solid';
+import { Category } from '@prisma/client';
+import {
+  Card,
+  Table,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableBody,
+  BadgeDelta,
+  DeltaType,
+  MultiSelectBox,
+  MultiSelectBoxItem,
+} from '@tremor/react';
 
 interface ToggleButtonProps {
   children: React.ReactNode;
@@ -41,13 +57,134 @@ const ToggleButton = ({
   );
 };
 
+interface CategoriesSelectorProps {
+  selectedCategory: Category | null;
+  setSelectedCategory: (category: Category) => void;
+}
+
+const CategoriesSelector = ({
+  selectedCategory,
+  setSelectedCategory,
+}: CategoriesSelectorProps) => {
+  const { data, isLoading } = api.categories.getAll.useQuery();
+
+  return (
+    <Listbox value={selectedCategory} onChange={setSelectedCategory}>
+      {({ open }) => (
+        <>
+          <Listbox.Label className="block text-sm font-medium text-white">
+            Category
+          </Listbox.Label>
+          <div className="relative">
+            <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-700 bg-gray-700 py-2 pl-3 pr-10 text-left shadow-sm focus:border-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-500 sm:text-sm">
+              <span className="block truncate">
+                {selectedCategory?.name ?? 'Select Spending Category'}
+              </span>
+              <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                <ChevronUpDownIcon
+                  className="h-5 w-5 text-gray-400"
+                  aria-hidden="true"
+                />
+              </span>
+            </Listbox.Button>
+
+            <Transition
+              show={open}
+              as={Fragment}
+              leave="transition ease-in duration-100"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-gray-800 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                <Listbox.Option
+                  className={({ active }) =>
+                    clsx(
+                      active ? 'bg-gray-600 text-white' : 'text-gray-100',
+                      'relative cursor-default select-none py-2 pl-8 pr-4'
+                    )
+                  }
+                  value={null}
+                >
+                  {({ selected, active }) => (
+                    <>
+                      <span
+                        className={clsx(
+                          selected ? 'font-semibold' : 'font-normal',
+                          'block truncate'
+                        )}
+                      >
+                        -
+                      </span>
+
+                      {selected ? (
+                        <span
+                          className={clsx(
+                            active ? 'text-white' : 'text-indigo-600',
+                            'absolute inset-y-0 left-0 flex items-center pl-1.5'
+                          )}
+                        >
+                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                      ) : null}
+                    </>
+                  )}
+                </Listbox.Option>
+                {data?.map((category) => (
+                  <Listbox.Option
+                    key={category.id}
+                    className={({ active }) =>
+                      clsx(
+                        active ? 'bg-gray-600 text-white' : 'text-gray-100',
+                        'relative cursor-default select-none py-2 pl-8 pr-4'
+                      )
+                    }
+                    value={category}
+                  >
+                    {({ selected, active }) => (
+                      <>
+                        <span
+                          className={clsx(
+                            selected ? 'font-semibold' : 'font-normal',
+                            'block truncate'
+                          )}
+                        >
+                          {category.name}
+                        </span>
+
+                        {selected ? (
+                          <span
+                            className={clsx(
+                              active ? 'text-white' : 'text-indigo-600',
+                              'absolute inset-y-0 left-0 flex items-center pl-1.5'
+                            )}
+                          >
+                            <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                          </span>
+                        ) : null}
+                      </>
+                    )}
+                  </Listbox.Option>
+                ))}
+              </Listbox.Options>
+            </Transition>
+          </div>
+        </>
+      )}
+    </Listbox>
+  );
+};
+
 export default function Home() {
   const [activeToggle, setActiveToggle] = useState<'+' | '-'>('+');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
   const amountRef = useRef<HTMLInputElement>(null);
   const noteRef = useRef<HTMLInputElement>(null);
-  const transactions = api.transactions.getAll.useQuery();
+  const { data: transactions, refetch } = api.transactions.getAll.useQuery();
+  const createTransaction = api.transactions.create.useMutation();
 
   return (
     <section className="flex flex-col justify-between gap-5">
@@ -135,11 +272,70 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <CategoriesSelector
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+      />
       <div>
-        <button className="flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+        <button
+          className="flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-black shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+          onClick={() => {
+            createTransaction.mutate({
+              note,
+              amount: Number(amount),
+              type: activeToggle === '+' ? 'DEPOSIT' : 'WITHDRAW',
+              categoryId: selectedCategory?.id ?? null,
+            });
+
+            refetch();
+          }}
+        >
           Create Transaction
         </button>
       </div>
+
+      <h1 className="text-2xl">Transactions</h1>
+      <Table className="mt-6">
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell className="text-white">Date</TableHeaderCell>
+            <TableHeaderCell className="text-white">Category</TableHeaderCell>
+            <TableHeaderCell className="text-white">Note</TableHeaderCell>
+            <TableHeaderCell className="text-right text-white">
+              Amount ($)
+            </TableHeaderCell>
+            <TableHeaderCell className="text-right text-white">
+              Type
+            </TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody></TableBody>
+        {transactions?.map((transaction) => (
+          <TableRow key={transaction.id}>
+            <TableCell className="text-gray-100">
+              {transaction.createdAt.toDateString()}
+            </TableCell>
+            <TableCell className="text-gray-100">
+              {transaction.category?.name ?? '-'}
+            </TableCell>
+            <TableCell className="text-gray-100">{transaction.note}</TableCell>
+            <TableCell className="text-right text-gray-100">
+              {transaction.amount}
+            </TableCell>
+            <TableCell className="text-right text-gray-100">
+              <BadgeDelta
+                deltaType={
+                  transaction.type === 'WITHDRAW' ? 'decrease' : 'increase'
+                }
+                size="xs"
+              >
+                {transaction.type}
+              </BadgeDelta>
+            </TableCell>
+          </TableRow>
+        ))}
+      </Table>
+      <div></div>
     </section>
   );
 }
