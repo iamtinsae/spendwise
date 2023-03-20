@@ -4,10 +4,10 @@ Spendwise is a budget and finance tracking application built using Next.js. With
 
 ## Features
 
-- [ ] Create and manage multiple budgets for different purposes
-- &check; Track your expenses and income
-- &check; Categorize your transactions for better visibility
+- ✅ Track your expenses and income
+- ✅ Categorize your transactions for better visibility
 - [ ] Set financial goals and monitor your progress
+- [ ] Create and manage multiple budgets for different purposes
 - [ ] Generate reports to help you make informed financial decisions
 
 ## Getting Started
