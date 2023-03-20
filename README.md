@@ -1,4 +1,7 @@
-# Spendwise
+<p align="center">
+    <img src="public/apple-touch-icon.png" height="80" />
+</p>
+<h1 align="center" style="font-size:50px;">Spend Wise</h1>
 
 Spendwise is a budget and finance tracking application built using Next.js. With Spendwise, you can easily manage your expenses and income, set budgets, and track your financial goals.
 
