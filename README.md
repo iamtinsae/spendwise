@@ -37,4 +37,4 @@ Spendwise is licensed under the MIT License. See the [LICENSE](LICENSE) file for
 
 ## Support
 
-If you have any questions or issues, please don't hesitate to reach out to us on [GitHub Issues](https://github.com/iamtinsae/spendwise/issues). I'll do our best to assist you as soon as possible.
+If you have any questions or issues, please don't hesitate to reach out to me on [GitHub Issues](https://github.com/iamtinsae/spendwise/issues). I'll do my best to assist you as soon as possible.
